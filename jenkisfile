@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+
+    environment {
+       GRADLE_HOME = tool name: 'GRADLE', type: 'Gradle'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/tu-usuario/tu-repo.git', branch: 'main'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    def gradleHome = tool name: 'GRADLE', type: 'Gradle'
+                    sh "${gradleHome}/bin/gradle clean build"
+                }
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Ejecuta las pruebas de Serenity BDD
+                script {
+                    def gradleHome = tool name: 'GRADLE', type: 'Gradle'
+                    sh "${gradleHome}/bin/gradle test"
+                }
+            }
+        }
+
+
+
+    post {
+        always {
+            // Limpia el espacio de trabajo después de la ejecución
+            cleanWs()
+        }
+    }
+}
